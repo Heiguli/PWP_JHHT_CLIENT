@@ -47,17 +47,17 @@ class BeatifyClient:
         json_response = response.json()
         return json_response
     
-    def create_album(self, title, artist_id):
+    def create_album(self, name, artist_id):
         data = {
-            "title": title,
+            "name": name,
             "artist_id": artist_id
         }
         response = self.session.post(f"{self.base_url}/Beatify/api/v1/albums", json=data)
         return response
     
-    def update_album(self, id, title, artist_id):
+    def update_album(self, id, name, artist_id):
         data = {
-            "title": title,
+            "name": name,
             "artist_id": artist_id
         }
         response = self.session.put(f"{self.base_url}/Beatify/api/v1/albums/{id}", json=data)

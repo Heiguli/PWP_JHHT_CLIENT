@@ -255,75 +255,102 @@ def show_users():
         else:
             st.warning("Please select a user to delete")
 
-    def show_playlists():
+def show_playlists():
 
-        st.title("Playlists")
-        playlists = client.get_playlists()
-        for playlist in playlists:
-            st.write(f"- name: {playlist['name']} (ID: {playlist['id']}) (Description: {playlist['description']})")
+    st.title("Playlists")
+    playlists = client.get_playlists()
+    for playlist in playlists:
+        st.write(f"- name: {playlist['name']} (ID: {playlist['id']}) (Description: {playlist['description']})")
 
-        st.divider()
-        st.subheader("Create Playlist")
-        name = st.text_input("Playlist name")
-        description = st.text_input("Playlist description")
-        if st.button("Create Playlist"):
-            if name:
-                response = client.create_playlist(name, description or "No description provided")
-                if response.status_code == 201:
-                    st.success(f"Playlist {name} created successfully!")
-                    st.rerun()
-                else:
-                    st.error(f"Error: {response.status_code}: {response.json().get('message')}")
-            else:
-                st.warning("Please enter a playlist name")
-        
-        st.divider()
-
-        st.subheader("Update Playlist")
-        playlist_options = {playlist["name"]: playlist["id"] for playlist in playlists}
-        selected_playlist = st.selectbox("Select playlist to update", list(playlist_options.keys()))
-        updated_playlist_name = st.text_input("New playlist name")
-        updated_playlist_description = st.text_input("New playlist description")
-        if st.button("Update Playlist"):
-            if updated_playlist_name:
-                playlist_id = playlist_options[selected_playlist]
-                response = client.update_playlist(playlist_id, updated_playlist_name, updated_playlist_description)
-                if response.status_code == 200:
-                    st.success("Playlist updated successfully!")
-                    st.rerun()
-                else:
-                    st.error(f"Error: {response.status_code}: {response.json().get('message')}")
-            else:
-                st.warning("Please enter a new name")
-
-        st.divider()
-
-        st.subheader("Delete Playlist")
-        selected_del = st.selectbox("Select playlist to delete", list(playlist_options.keys()), key="del_playlist")
-        if st.button("Delete Playlist"):    
-            if selected_del:
-                playlist_id = playlist_options[selected_del]
-                response = client.delete_playlist(playlist_id)
-                if response.status_code == 200:
-                    st.success("Playlist deleted successfully!")
-                    st.rerun()
-                else:
-                    st.error(f"Error: {response.status_code}: {response.json().get('message')}")
-            else:
-                st.warning("Please select a playlist to delete")
-
-        st.divider()
-        st.subheader("Add Track to Playlist")
-        tracks = client.get_tracks()
-        track_options = {track["name"]: track["id"] for track in tracks}
-        selected_playlist_for_track = st.selectbox("Select playlist", list(playlist_options.keys()), key="playlist_for_track")
-        selected_track = st.selectbox("Select track to add", list(track_options.keys()))
-        if st.button("Add Track"):
-            playlist_id = playlist_options[selected_playlist_for_track]
-            track_id = track_options[selected_track]
-            response = client.add_track_to_playlist(playlist_id, track_id)
-            if response.status_code == 200:
-                st.success("Track added to playlist!")
+    st.divider()
+    st.subheader("Create Playlist")
+    name = st.text_input("Playlist name")
+    description = st.text_input("Playlist description")
+    if st.button("Create Playlist"):
+        if name:
+            response = client.create_playlist(name, description or "No description provided")
+            if response.status_code == 201:
+                st.success(f"Playlist {name} created successfully!")
                 st.rerun()
             else:
                 st.error(f"Error: {response.status_code}: {response.json().get('message')}")
+        else:
+            st.warning("Please enter a playlist name")
+    
+    st.divider()
+
+    st.subheader("Update Playlist")
+    playlist_options = {playlist["name"]: playlist["id"] for playlist in playlists}
+    selected_playlist = st.selectbox("Select playlist to update", list(playlist_options.keys()))
+    updated_playlist_name = st.text_input("New playlist name")
+    updated_playlist_description = st.text_input("New playlist description")
+    if st.button("Update Playlist"):
+        if updated_playlist_name:
+            playlist_id = playlist_options[selected_playlist]
+            response = client.update_playlist(playlist_id, updated_playlist_name, updated_playlist_description)
+            if response.status_code == 200:
+                st.success("Playlist updated successfully!")
+                st.rerun()
+            else:
+                st.error(f"Error: {response.status_code}: {response.json().get('message')}")
+        else:
+            st.warning("Please enter a new name")
+
+    st.divider()
+
+    st.subheader("Delete Playlist")
+    selected_del = st.selectbox("Select playlist to delete", list(playlist_options.keys()), key="del_playlist")
+    if st.button("Delete Playlist"):    
+        if selected_del:
+            playlist_id = playlist_options[selected_del]
+            response = client.delete_playlist(playlist_id)
+            if response.status_code == 200:
+                st.success("Playlist deleted successfully!")
+                st.rerun()
+            else:
+                st.error(f"Error: {response.status_code}: {response.json().get('message')}")
+        else:
+            st.warning("Please select a playlist to delete")
+
+    st.divider()
+    st.subheader("Add Track to Playlist")
+    tracks = client.get_tracks()
+    track_options = {track["name"]: track["id"] for track in tracks}
+    selected_playlist_for_track = st.selectbox("Select playlist", list(playlist_options.keys()), key="playlist_for_track")
+    selected_track = st.selectbox("Select track to add", list(track_options.keys()))
+    if st.button("Add Track"):
+        playlist_id = playlist_options[selected_playlist_for_track]
+        track_id = track_options[selected_track]
+        response = client.add_track_to_playlist(playlist_id, track_id)
+        if response.status_code == 200:
+            st.success("Track added to playlist!")
+            st.rerun()
+        else:
+            st.error(f"Error: {response.status_code}: {response.json().get('message')}")
+
+    st.divider()
+
+    st.subheader("Add User to Playlist")
+    user_options = {user["name"]: user["id"] for user in client.get_users()}
+    selected_playlist_for_user = st.selectbox("Select playlist", list(playlist_options.keys()), key="playlist_for_user")
+    selected_user = st.selectbox("Select user to add", list(user_options.keys()))
+    if st.button("Add User"):
+        playlist_id = playlist_options[selected_playlist_for_user]
+        user_id = user_options[selected_user]
+        response = client.add_user_to_playlist(playlist_id, user_id)
+        if response.status_code == 200:
+            st.success("User added to playlist!")
+            st.rerun()
+        else:
+            st.error(f"Error: {response.status_code}: {response.json().get('message')}")
+
+if page == "Artists":
+    show_artists()
+elif page == "Albums":
+    show_albums()
+elif page == "Tracks":
+    show_tracks()
+elif page == "Users":
+    show_users()
+elif page == "Playlists":
+    show_playlists()
